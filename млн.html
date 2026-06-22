@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кім миллионер болғысы келеді? — Кеңейтілген нұсқа</title>
+    <!-- Заманауи интерфейс үшін Tailwind CSS қосу -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome иконкаларын қосу -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Скроллбарлар мен арнайы стильдер -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,600;0,800;1,400&display=swap');
+        body {
+            font-family: 'Montserrat', sans-serif;
+            user-select: none;
+        }
+        /* Скроллбарды сәндеу */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        /* Алтын және көк түсті жарық әсерлері */
+        .glow-gold {
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
+        }
+        .glow-blue {
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-white min-h-screen overflow-x-hidden transition-all duration-300" id="gameBody">
+
+    <!-- БАСҚАРУ ТОРЫ ЖӘНЕ МАСШТАБТАУ ОРАУЫШЫ -->
+    <div id="scaleWrapper" class="origin-top transition-transform duration-200 min-h-screen flex flex-col">
+        
+        <!-- КЛАССИКАЛЫҚ БАС МӘЗІР (МЕНЮ-БАР) -->
+        <nav class="bg-slate-900 border-b border-slate-800 text-sm z-50 sticky top-0">
+            <div class="max-w-7xl mx-auto px-4 flex flex-wrap items-center justify-between">
+                <div class="flex flex-wrap items-center space-x-1 py-1">
+                    
+                    <!-- "Ойын" мәзірі -->
+                    <div class="relative group">
+                        <button class="px-3 py-1.5 rounded hover:bg-slate-800 focus:outline-none flex items-center gap-1 font-semibold">
+                            <i class="fa-solid fa-gamepad text-amber-500"></i> Ойын <i class="fa-solid fa-chevron-down text-xs opacity-50"></i>
+                        </button>
+                        <div class="absolute left-0 mt-1 w-72 bg-slate-900 border border-slate-700 rounded-md shadow-2xl hidden group-hover:block z-50 py-1">
+                            <button onclick="startNewGame()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex justify-between items-center">
+                                <span><i class="fa-solid fa-play text-emerald-500 mr-2"></i> Жаңа ойын</span>
+                                <span class="text-xs text-slate-500">F2</span>
+                            </button>
+                            <hr class="border-slate-800 my-1">
+                            <label class="w-full text-left px-4 py-2 hover:bg-slate-800 flex justify-between items-center cursor-pointer">
+                                <span><i class="fa-solid fa-rotate-right text-blue-400 mr-2"></i> Автобастау</span>
+                                <input type="checkbox" id="chkAutostart" class="rounded bg-slate-800 border-slate-700 text-amber-500 focus:ring-amber-500" onchange="toggleAutostart(this.checked)">
+                            </label>
+                            <label class="w-full text-left px-4 py-2 hover:bg-slate-800 flex justify-between items-center cursor-pointer">
+                                <span><i class="fa-solid fa-image text-purple-400 mr-2"></i> Фотоны көрсету</span>
+                                <input type="checkbox" id="chkShowPhotos" checked class="rounded bg-slate-800 border-slate-700 text-amber-500 focus:ring-amber-500" onchange="toggleShowPhotos(this.checked)">
+                            </label>
+                            <button onclick="togglePhotoModal(true)" class="w-full text-left px-6 py-1.5 text-xs text-slate-400 hover:bg-slate-800">
+                                <i class="fa-solid fa-eye mr-2"></i> Суретті көрсету/жасыру <span class="float-right text-[10px] bg-slate-700 px-1 rounded">Бос орын</span>
+                            </button>
+                            <hr class="border-slate-800 my-1">
+                            <label class="w-full text-left px-4 py-2 hover:bg-slate-800 flex justify-between items-center cursor-pointer">
+                                <span><i class="fa-solid fa-volume-high text-green-400 mr-2"></i> Дыбыс</span>
+                                <input type="checkbox" id="chkSound" checked class="rounded bg-slate-800 border-slate-700 text-amber-500 focus:ring-amber-500" onchange="toggleSound(this.checked)">
+                            </label>
+                            <label class="w-full text-left px-4 py-2 hover:bg-slate-800 flex justify-between items-center cursor-pointer">
+                                <span><i class="fa-solid fa-music text-pink-400 mr-2"></i> Фондық әуен</span>
+                                <input type="checkbox" id="chkBgMusic" checked class="rounded bg-slate-800 border-slate-700 text-amber-500 focus:ring-amber-500" onchange="toggleBgMusic(this.checked)">
+                            </label>
+                            <div class="px-4 py-2 hover:bg-slate-800 flex flex-col gap-1">
+                                <span class="text-xs text-slate-400"><i class="fa-solid fa-sliders mr-2"></i> Дыбыс деңгейі: <span id="volVal">80%</span></span>
+                                <input type="range" min="0" max="100" value="80" class="w-full accent-amber-500 bg-slate-700 h-1 rounded-lg appearance-none cursor-pointer" oninput="updateVolume(this.value)">
+                            </div>
+                            <hr class="border-slate-800 my-1">
+                            <label class="w-full text-left px-4 py-2 hover:bg-slate-800 flex justify-between items-center cursor-pointer">
+                                <span><i class="fa-solid fa-comment-dots text-yellow-400 mr-2"></i> Репликаларды дыбыстау</span>
+                                <input type="checkbox" id="chkDuplicateSpeech" checked class="rounded bg-slate-800 border-slate-700 text-amber-500 focus:ring-amber-500" onchange="toggleSpeechDuplication(this.checked)">
+                            </label>
+                            <hr class="border-slate-800 my-1">
+                            <label class="w-full text-left px-4 py-2 hover:bg-slate-800 flex justify-between items-center cursor-pointer">
+                                <span><i class="fa-solid fa-hourglass-half text-rose-400 mr-2"></i> Кері санақ</span>
+                                <input type="checkbox" id="chkTimer" checked class="rounded bg-slate-800 border-slate-700 text-amber-500 focus:ring-amber-500" onchange="toggleTimer(this.checked)">
+                            </label>
+                            <div class="px-4 py-2 hover:bg-slate-800 flex flex-col gap-1">
+                                <span class="text-xs text-slate-400"><i class="fa-solid fa-clock mr-2"></i> Санақ уақыты: <span id="timerVal">30 сек</span></span>
+                                <input type="range" min="15" max="120" value="30" class="w-full accent-amber-500 bg-slate-700 h-1 rounded-lg appearance-none cursor-pointer" oninput="updateTimerDuration(this.value)">
+                            </div>
+                            <hr class="border-slate-800 my-1">
+                            <button onclick="toggleFullscreen()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center">
+                                <i class="fa-solid fa-expand text-sky-400 mr-2 text-center w-5"></i> Толық экран режимі
+                            </button>
+                            <button onclick="exitApp()" class="w-full text-left px-4 py-2 hover:bg-slate-800 text-rose-400 font-semibold flex items-center">
+                                <i class="fa-solid fa-power-off mr-2 text-center w-5"></i> Шығу
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- "Баптаулар" мәзірі -->
+                    <div class="relative group">
+                        <button class="px-3 py-1.5 rounded hover:bg-slate-800 focus:outline-none flex items-center gap-1 font-semibold">
+                            <i class="fa-solid fa-sliders text-amber-500"></i> Баптаулар <i class="fa-solid fa-chevron-down text-xs opacity-50"></i>
+                        </button>
+                        <div class="absolute left-0 mt-1 w-64 bg-slate-900 border border-slate-700 rounded-md shadow-2xl hidden group-hover:block z-50 py-1">
+                            <button onclick="openModal('modalPlayer')" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center">
+                                <i class="fa-solid fa-user text-teal-400 mr-2 text-center w-5"></i> Ағымдағы ойыншы
+                            </button>
+                            <button onclick="openModal('modalLeaderboard')" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center">
+                                <i class="fa-solid fa-trophy text-amber-400 mr-2 text-center w-5"></i> Ойыншылар мен ұтыстар
+                            </button>
+                            <hr class="border-slate-800 my-1">
+                            <button onclick="openModal('modalQuestions')" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center">
+                                <i class="fa-solid fa-circle-question text-sky-400 mr-2 text-center w-5"></i> Сұрақтар редакторы
+                            </button>
+                            <button onclick="openModal('modalPhrases')" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center">
+                                <i class="fa-solid fa-message text-indigo-400 mr-2 text-center w-5"></i> Жүргізуші сөздері
+                            </button>
+                            <button onclick="openModal('modalGameSettings')" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center">
+                                <i class="fa-solid fa-gear text-slate-400 mr-2 text-center w-5"></i> Ойын және көмектерді баптау
+                            </button>
+                            <hr class="border-slate-800 my-1">
+                            <!-- Фон түсі -->
+                            <div class="px-4 py-2 hover:bg-slate-800 flex items-center justify-between">
+                                <span class="flex items-center"><i class="fa-solid fa-palette text-pink-400 mr-2 text-center w-5"></i> Фон түсі</span>
+                                <input type="color" value="#020617" id="colorBgPicker" oninput="changeBgColor(this.value)" class="w-8 h-6 bg-transparent border-0 cursor-pointer rounded">
+                            </div>
+                            <!-- Терезе мөлдірлігі -->
+                            <div class="px-4 py-2 hover:bg-slate-800 flex flex-col gap-1">
+                                <span class="text-xs text-slate-400"><i class="fa-solid fa-eye-slash mr-2"></i> Терезе мөлдірлігі: <span id="opacityVal">100%</span></span>
+                                <input type="range" min="30" max="100" value="100" class="w-full accent-amber-500 bg-slate-700 h-1 rounded-lg appearance-none cursor-pointer" oninput="updateOpacity(this.value)">
+                            </div>
+                            <!-- Масштаб -->
+                            <div class="px-4 py-2 hover:bg-slate-800 flex flex-col gap-1">
+                                <span class="text-xs text-slate-400"><i class="fa-solid fa-maximize mr-2"></i> Басты терезе масштабы: <span id="scaleVal">1.0x</span></span>
+                                <input type="range" min="80" max="120" value="100" class="w-full accent-amber-500 bg-slate-700 h-1 rounded-lg appearance-none cursor-pointer" oninput="updateScale(this.value)">
+                            </div>
+                            <hr class="border-slate-800 my-1">
+                            <label class="w-full text-left px-4 py-2 hover:bg-slate-800 flex justify-between items-center cursor-pointer">
+                                <span><i class="fa-solid fa-window-minimize text-slate-400 mr-2 text-center w-5"></i> Трейге жинау</span>
+                                <input type="checkbox" id="chkTray" class="rounded bg-slate-800 border-slate-700 text-amber-500 focus:ring-amber-500">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- "Анықтама" мәзірі -->
+                    <div class="relative group">
+                        <button class="px-3 py-1.5 rounded hover:bg-slate-800 focus:outline-none flex items-center gap-1 font-semibold">
+                            <i class="fa-solid fa-circle-info text-amber-500"></i> Анықтама <i class="fa-solid fa-chevron-down text-xs opacity-50"></i>
+                        </button>
+                        <div class="absolute left-0 mt-1 w-64 bg-slate-900 border border-slate-700 rounded-md shadow-2xl hidden group-hover:block z-50 py-1">
+                            <button onclick="openModal('modalHelp')" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center">
+                                <i class="fa-solid fa-question text-emerald-400 mr-2 text-center w-5"></i> Көмек
+                            </button>
+                            <button onclick="showTipOfDay()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center">
+                                <i class="fa-regular fa-lightbulb text-yellow-400 mr-2 text-center w-5"></i> Күн кеңесі
+                            </button>
+                            <button onclick="openModal('modalAbout')" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center">
+                                <i class="fa-solid fa-circle-nodes text-blue-400 mr-2 text-center w-5"></i> Ойын туралы
+                            </button>
+                            <hr class="border-slate-800 my-1">
+                            <a href="#" onclick="alertCustom('Ойынның басты беті', 'Жаңартулар мен дыбыстар топтамасын жүктеу...')" class="block px-4 py-2 hover:bg-slate-800 flex items-center">
+                                <i class="fa-solid fa-house text-purple-400 mr-2 text-center w-5"></i> Басты бет
+                            </a>
+                            <a href="#" onclick="alertCustom('Автор сайты', 'Әзірлеушінің сайтына өту...')" class="block px-4 py-2 hover:bg-slate-800 flex items-center">
+                                <i class="fa-solid fa-globe text-cyan-400 mr-2 text-center w-5"></i> Автордың сайты
+                            </a>
+                            <a href="mailto:support@millionaire-game.example.com" class="block px-4 py-2 hover:bg-slate-800 flex items-center">
+                                <i class="fa-solid fa-envelope text-pink-400 mr-2 text-center w-5"></i> Авторға хат жазу
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ойыншының ағымдағы күйі -->
+                <div class="py-1 flex items-center gap-3 text-xs md:text-sm">
+                    <span class="text-slate-400">Ойыншы: <strong class="text-amber-400" id="currentUserNameDisplay">Қонақ</strong></span>
+                    <span class="text-slate-400">Баланс: <strong class="text-emerald-400" id="currentUserScoreDisplay">0 теңге</strong></span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- НЕГІЗГІ ОЙЫН ИНТЕРФЕЙСІ -->
+        <main class="flex-grow max-w-7xl w-full mx-auto p-4 flex flex-col lg:flex-row gap-6 items-stretch">
+            
+            <!-- СОЛ ЖАҚ: Ойын аймағы, Жүргізуші, Сұрақтар -->
+            <div class="flex-grow flex flex-col gap-4 lg:w-2/3">
+                
+                <!-- ЖҮРГІЗУШІ ЖӘНЕ ОНЫҢ СӨЗДЕРІ -->
+                <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col md:flex-row gap-4 items-center relative overflow-hidden" id="hostBox">
+                    <div class="flex flex-col items-center text-center">
+                        <!-- Жүргізушінің суреті (аватар) -->
+                        <div class="w-24 h-24 rounded-full border-4 border-amber-500 overflow-hidden bg-slate-800 flex items-center justify-center glow-blue" id="hostAvatarContainer">
+                            <span class="text-4xl">🤵</span>
+                        </div>
+                        <span class="text-xs text-amber-500 font-bold mt-2 tracking-wide uppercase" id="hostNameLabel">Есен Елеукен</span>
+                    </div>
+
+                    <!-- Мәтіндік сөз бұлты -->
+                    <div class="flex-grow w-full">
+                        <div class="bg-slate-950/80 rounded-lg p-3 border border-slate-800 text-slate-100 min-h-[70px] relative">
+                            <div class="absolute -left-2 top-6 w-4 h-4 bg-slate-950 border-l border-b border-slate-800 transform rotate-45 hidden md:block"></div>
+                            <p class="text-sm italic" id="hostReplicaText">Ойынға қош келдіңіз! Ойынды бастау үшін жоғарғы мәзірден "Жаңа ойын" батырмасын басыңыз немесе F2 пернесін қолданыңыз!</p>
+                        </div>
+                    </div>
+
+                    <!-- Дыбыстауға арналған көмекші панель -->
+                    <div id="duplicateSpeechPanel" class="absolute bottom-2 right-2 bg-slate-950/90 border border-slate-700 px-2 py-1 rounded text-[11px] text-amber-400 cursor-pointer flex items-center gap-1 hover:bg-slate-800" onclick="speakText(document.getElementById('hostReplicaText').innerText)">
+                        <i class="fa-solid fa-volume-low"></i> Репликаны дыбыстау
+                    </div>
+                </div>
+
+                <!-- ИЛЛЮСТРАЦИЯ ТЕРЕЗЕСІ (ФОТОЛАР ҮШІН) -->
+                <div id="photoWindow" class="hidden bg-slate-900 border border-slate-700 rounded-xl p-4 flex flex-col items-center justify-center relative overflow-hidden h-64 shadow-2xl">
+                    <button onclick="togglePhotoModal(false)" class="absolute top-2 right-2 text-slate-400 hover:text-white bg-slate-800 p-1.5 rounded-full">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <div class="text-center mb-2 text-xs uppercase tracking-widest text-slate-400">Ағымдағы сурет</div>
+                    
+                    <div class="w-48 h-36 bg-slate-800 border-2 border-amber-500 rounded flex items-center justify-center overflow-hidden glow-gold relative" id="photoPlaceholder">
+                        <svg class="w-20 h-20 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <div class="absolute bottom-0 inset-x-0 bg-slate-950/80 py-1 text-[10px] text-amber-400 font-bold uppercase tracking-wider" id="photoCaption">Ұтыс!</div>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-2 text-center italic">Бұл терезені тез жабу/ашу үшін "Бос орын" (Space) пернесін басыңыз.</p>
+                </div>
+
+                <!-- КӨМЕКТЕР -->
+                <div class="grid grid-cols-3 gap-3">
+                    <button id="btnLifelineFifty" onclick="useFiftyFifty()" class="bg-gradient-to-r from-slate-900 to-slate-850 border border-slate-700 hover:border-amber-500 py-3 rounded-lg flex flex-col items-center justify-center transition-all duration-200 group active:scale-95 disabled:opacity-40 disabled:pointer-events-none">
+                        <span class="text-lg font-extrabold text-amber-500 group-hover:scale-110 transition-transform">50:50</span>
+                        <span class="text-[10px] uppercase text-slate-400 mt-1">Екі нұсқаны жою</span>
+                    </button>
+                    <button id="btnLifelineFriend" onclick="usePhoneFriend()" class="bg-gradient-to-r from-slate-900 to-slate-850 border border-slate-700 hover:border-amber-500 py-3 rounded-lg flex flex-col items-center justify-center transition-all duration-200 group active:scale-95 disabled:opacity-40 disabled:pointer-events-none">
+                        <i class="fa-solid fa-phone text-lg text-sky-400 group-hover:scale-110 transition-transform"></i>
+                        <span class="text-[10px] uppercase text-slate-400 mt-1 text-center" id="lblLifelineFriendName">Досқа қоңырау</span>
+                    </button>
+                    <button id="btnLifelineAudience" onclick="useAskAudience()" class="bg-gradient-to-r from-slate-900 to-slate-850 border border-slate-700 hover:border-amber-500 py-3 rounded-lg flex flex-col items-center justify-center transition-all duration-200 group active:scale-95 disabled:opacity-40 disabled:pointer-events-none">
+                        <i class="fa-solid fa-users text-lg text-emerald-400 group-hover:scale-110 transition-transform"></i>
+                        <span class="text-[10px] uppercase text-slate-400 mt-1 text-center" id="lblLifelineAudienceName">Зал көмегі</span>
+                    </button>
+                </div>
+
+                <!-- СҰРАҚ ЭКРАНЫ ЖӘНЕ КЕРІ САНАҚ -->
+                <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-6 flex flex-col items-center justify-center text-center relative overflow-hidden min-h-[160px] glow-blue">
+                    
+                    <!-- Кері санақ дөңгелегі -->
+                    <div id="countdownCircle" class="absolute top-4 right-4 w-12 h-12 rounded-full border-4 border-amber-500 flex items-center justify-center bg-slate-950">
+                        <span class="text-sm font-bold text-amber-400" id="timerSeconds">30</span>
+                    </div>
+
+                    <!-- Сұрақ деңгейінің индикаторы -->
+                    <span class="text-xs uppercase font-extrabold tracking-widest text-slate-500 mb-2" id="questionLevelLabel">Сұрақ 1 (Құны: 500 теңге)</span>
+                    
+                    <!-- Сұрақ мәтіні -->
+                    <h2 class="text-lg md:text-xl font-bold max-w-2xl text-slate-100" id="questionText">Ойынды бастау үшін жаңа ойынды қосыңыз!</h2>
+                </div>
+
+                <!-- ЖАУАП НҰСҚАЛАРЫ -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Жауап А -->
+                    <button id="btnAnswer0" onclick="selectAnswer(0)" class="bg-gradient-to-r from-slate-900 to-slate-950 border border-slate-800 hover:border-amber-500 p-4 rounded-xl flex items-center text-left transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none group active:scale-95">
+                        <span class="text-amber-500 font-bold mr-3 border border-amber-500/30 px-2 py-0.5 rounded text-xs bg-amber-500/10">A:</span>
+                        <span class="text-slate-200 group-hover:text-white font-medium" id="answerText0">Ойынның басталуын күту...</span>
+                    </button>
+                    <!-- Жауап B -->
+                    <button id="btnAnswer1" onclick="selectAnswer(1)" class="bg-gradient-to-r from-slate-900 to-slate-950 border border-slate-800 hover:border-amber-500 p-4 rounded-xl flex items-center text-left transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none group active:scale-95">
+                        <span class="text-amber-500 font-bold mr-3 border border-amber-500/30 px-2 py-0.5 rounded text-xs bg-amber-500/10">B:</span>
+                        <span class="text-slate-200 group-hover:text-white font-medium" id="answerText1">Ойынның басталуын күту...</span>
+                    </button>
+                    <!-- Жауап C -->
+                    <button id="btnAnswer2" onclick="selectAnswer(2)" class="bg-gradient-to-r from-slate-900 to-slate-950 border border-slate-800 hover:border-amber-500 p-4 rounded-xl flex items-center text-left transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none group active:scale-95">
+                        <span class="text-amber-500 font-bold mr-3 border border-amber-500/30 px-2 py-0.5 rounded text-xs bg-amber-500/10">C:</span>
+                        <span class="text-slate-200 group-hover:text-white font-medium" id="answerText2">Ойынның басталуын күту...</span>
+                    </button>
+                    <!-- Жауап D -->
+                    <button id="btnAnswer3" onclick="selectAnswer(3)" class="bg-gradient-to-r from-slate-900 to-slate-950 border border-slate-800 hover:border-amber-500 p-4 rounded-xl flex items-center text-left transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none group active:scale-95">
+                        <span class="text-amber-500 font-bold mr-3 border border-amber-500/30 px-2 py-0.5 rounded text-xs bg-amber-500/10">D:</span>
+                        <span class="text-slate-200 group-hover:text-white font-medium" id="answerText3">Ойынның басталуын күту...</span>
+                    </button>
+                </div>
+
+                <!-- ҰТЫСТЫ АЛУ БАТЫРМАСЫ -->
+                <button id="btnTakeMoney" onclick="takeMoney()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white font-bold py-3.5 rounded-xl transition-all duration-200 shadow-lg flex items-center justify-center gap-2 tracking-wider uppercase text-sm active:scale-95 disabled:opacity-40 disabled:pointer-events-none">
+                    <i class="fa-solid fa-hand-holding-dollar text-lg"></i> Ұтысты алу (Ойынды тоқтату)
+                </button>
+
+            </div>
+
+            <!-- ОҢ ЖАҚ: Ақша сатысы -->
+            <div class="lg:w-1/3 flex flex-col gap-4">
+                <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col justify-between h-full relative overflow-hidden">
+                    <div>
+                        <h3 class="text-xs uppercase font-extrabold tracking-widest text-slate-400 mb-4 border-b border-slate-800 pb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-layer-group text-amber-500"></i> Ақша сатысы
+                        </h3>
+                        
+                        <!-- Саты деңгейлері -->
+                        <div class="flex flex-col gap-1 text-sm font-semibold" id="moneyLadderContainer">
+                            <!-- Бұл жерге сатылар скрипт арқылы шығады -->
+                        </div>
+                    </div>
+
+                    <!-- Статус түсініктемесі -->
+                    <div class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-400 flex flex-col gap-1">
+                        <div><span class="inline-block w-2.5 h-2.5 rounded bg-amber-500 mr-2"></span>Күймейтін сома</div>
+                        <div><span class="inline-block w-2.5 h-2.5 rounded bg-emerald-500 mr-2"></span>Ағымдағы деңгей</div>
+                        <div><span class="inline-block w-2.5 h-2.5 rounded bg-slate-700 mr-2"></span>Қалыпты деңгей</div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- =============== МОДАЛЬДЫ ТЕРЕЗЕЛЕР =============== -->
+
+    <!-- ТЕРЕЗЕ: АҒЫМДАҒЫ ОЙЫНШЫ -->
+    <div id="modalPlayer" class="fixed inset-0 bg-black/80 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-md w-full p-6 shadow-2xl relative">
+            <button onclick="closeModal('modalPlayer')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-lg font-bold mb-4 text-amber-400"><i class="fa-solid fa-user mr-2"></i> Ойыншыны басқару</h3>
+            <div class="flex flex-col gap-4">
+                <div>
+                    <label class="block text-xs text-slate-400 uppercase tracking-widest mb-1">Ойыншының аты</label>
+                    <input type="text" id="inputPlayerName" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-white focus:border-amber-500 focus:outline-none">
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="savePlayerName()" class="flex-grow bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2 rounded text-sm transition-colors">Сақтау</button>
+                    <button onclick="resetPlayerName()" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded text-sm transition-colors">Бастапқы күй</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ТЕРЕЗЕ: РЕЙТИНГ (ОЙЫНШЫЛАР МЕН ҰТЫСТАР) -->
+    <div id="modalLeaderboard" class="fixed inset-0 bg-black/80 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-lg w-full p-6 shadow-2xl relative">
+            <button onclick="closeModal('modalLeaderboard')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-lg font-bold mb-4 text-amber-400"><i class="fa-solid fa-trophy mr-2"></i> Ойыншылар рейтингі</h3>
+            <div class="max-h-60 overflow-y-auto border border-slate-800 rounded bg-slate-950 p-2 mb-4">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-slate-800 text-slate-400 text-left text-xs uppercase">
+                            <th class="p-2">Орын</th>
+                            <th class="p-2">Ойыншы аты</th>
+                            <th class="p-2 text-right">Ұтыс сомасы</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardTableBody">
+                        <!-- Скриптпен толтырылады -->
+                    </tbody>
+                </table>
+            </div>
+            <button onclick="clearLeaderboard()" class="w-full bg-rose-600 hover:bg-rose-700 text-white py-2 rounded text-sm font-bold transition-colors">Рекордтар тізімін тазалау</button>
+        </div>
+    </div>
+
+    <!-- ТЕРЕЗЕ: СҰРАҚТАР РЕДАКТОРЫ -->
+    <div id="modalQuestions" class="fixed inset-0 bg-black/80 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-2xl w-full p-6 shadow-2xl relative max-h-[90vh] flex flex-col">
+            <button onclick="closeModal('modalQuestions')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-lg font-bold mb-2 text-amber-400"><i class="fa-solid fa-circle-question mr-2"></i> Сұрақтар базасы және статистика</h3>
+            
+            <div class="grid grid-cols-3 gap-2 mb-4 bg-slate-950 p-3 rounded text-center border border-slate-850">
+                <div class="border-r border-slate-800"><span class="block text-xs text-slate-400">Жалпы сұрақтар</span><strong id="statTotalQ" class="text-lg text-emerald-400">15</strong></div>
+                <div class="border-r border-slate-800"><span class="block text-xs text-slate-400">Жеңіл (1-5)</span><strong id="statEasyQ" class="text-lg text-amber-400">5</strong></div>
+                <div><span class="block text-xs text-slate-400">Қиын (11-15)</span><strong id="statHardQ" class="text-lg text-rose-400">5</strong></div>
+            </div>
+
+            <div class="flex-grow overflow-y-auto mb-4 border border-slate-800 rounded bg-slate-950 p-3">
+                <h4 class="text-xs uppercase text-slate-400 font-bold mb-2">Өз сұрағыңызды қосыңыз</h4>
+                <div class="flex flex-col gap-2.5">
+                    <input type="text" id="newQText" placeholder="Сұрақ мәтіні" class="bg-slate-900 border border-slate-800 rounded p-2 text-sm text-white focus:outline-none focus:border-amber-500">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" id="newQA" placeholder="А нұсқасы (ДҰРЫС ЖАУАП)" class="bg-slate-900 border-2 border-emerald-500/40 rounded p-2 text-sm text-white focus:outline-none">
+                        <input type="text" id="newQB" placeholder="B нұсқасы" class="bg-slate-900 border border-slate-800 rounded p-2 text-sm text-white focus:outline-none">
+                        <input type="text" id="newQC" placeholder="C нұсқасы" class="bg-slate-900 border border-slate-800 rounded p-2 text-sm text-white focus:outline-none">
+                        <input type="text" id="newQD" placeholder="D нұсқасы" class="bg-slate-900 border border-slate-800 rounded p-2 text-sm text-white focus:outline-none">
+                    </div>
+                    <div class="flex justify-between items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-slate-400">Қиындық деңгейі:</span>
+                            <select id="newQLevel" class="bg-slate-900 border border-slate-800 rounded p-1 text-xs text-white">
+                                <option value="1">1 (Өте жеңіл)</option>
+                                <option value="5">5</option>
+                                <option value="10">10 (Орташа)</option>
+                                <option value="15">15 (Ең қиын)</option>
+                            </select>
+                        </div>
+                        <button onclick="addCustomQuestion()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-1.5 rounded text-xs transition-colors">Сақтау</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ТЕРЕЗЕ: ЖҮРГІЗУШІ СӨЗДЕРІ -->
+    <div id="modalPhrases" class="fixed inset-0 bg-black/80 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-md w-full p-6 shadow-2xl relative">
+            <button onclick="closeModal('modalPhrases')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-lg font-bold mb-4 text-amber-400"><i class="fa-solid fa-message mr-2"></i> Жүргізуші сөздері</h3>
+            <div class="flex flex-col gap-3">
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Сәлемдесу сөзі</label>
+                    <input type="text" id="phraseWelcome" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-sm text-white">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Дұрыс жауап бергенде</label>
+                    <input type="text" id="phraseCorrect" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-sm text-white">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Қате жауап бергенде</label>
+                    <input type="text" id="phraseWrong" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-sm text-white">
+                </div>
+                <button onclick="saveHostPhrases()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2 rounded text-sm transition-colors mt-2">Жаңа сөздерді қолдану</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ТЕРЕЗЕ: ОЙЫН ЖӘНЕ КӨМЕКТЕРДІ БАПТАУ -->
+    <div id="modalGameSettings" class="fixed inset-0 bg-black/80 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-lg w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('modalGameSettings')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-lg font-bold mb-4 text-amber-400"><i class="fa-solid fa-gears mr-2"></i> Ойын және көмектерді баптау</h3>
+            
+            <div class="flex flex-col gap-4 text-sm">
+                <!-- Жүргізуші баптауы -->
+                <div class="border-b border-slate-800 pb-3">
+                    <h4 class="font-bold text-slate-300 mb-2">Жүргізуші баптауы</h4>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Жүргізуші аты</label>
+                            <input type="text" id="cfgHostName" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Аватар (Emoji / Таңба)</label>
+                            <input type="text" id="cfgHostEmoji" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-white" placeholder="🤵">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Көмек атаулары -->
+                <div class="border-b border-slate-800 pb-3">
+                    <h4 class="font-bold text-slate-300 mb-2">Көмек түрлерін өзгерту</h4>
+                    <div class="grid grid-cols-2 gap-2 mb-2">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">"Досқа қоңырау" атауы</label>
+                            <input type="text" id="cfgLifelineFriend" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">"Зал көмегі" атауы</label>
+                            <input type="text" id="cfgLifelineAudience" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-white">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Виртуалды дос деректері -->
+                <div>
+                    <h4 class="font-bold text-slate-300 mb-2">Виртуалды дос деректері</h4>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Достың аты</label>
+                            <input type="text" id="cfgFriendName" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Телефон</label>
+                            <input type="text" id="cfgFriendPhone" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Мамандығы</label>
+                            <input type="text" id="cfgFriendJob" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-white">
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="applyGameSettings()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2 rounded text-sm transition-colors">Конфигурацияны сақтау</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ТЕРЕЗЕ: КӨМЕК (АНЫҚТАМА) -->
+    <div id="modalHelp" class="fixed inset-0 bg-black/80 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-lg w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('modalHelp')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-lg font-bold mb-4 text-amber-400"><i class="fa-solid fa-circle-question mr-2"></i> Ойын бойынша анықтама</h3>
+            <div class="text-sm text-slate-300 flex flex-col gap-3">
+                <p><strong>Ойынның мақсаты:</strong> Әртүрлі қиындықтағы 15 сұраққа дұрыс жауап беріп, бас жүлде — <strong>3 000 000 теңге</strong> ұтып алу!</p>
+                <p>Әр сұрақтың 4 жауап нұсқасы болады, оның тек біреуі ғана дұрыс. Сіздің иелігіңізде үш классикалық көмек бар.</p>
+                <hr class="border-slate-850">
+                <p><strong>Жедел пернелер:</strong></p>
+                <ul class="list-disc pl-5 flex flex-col gap-1">
+                    <li><kbd class="bg-slate-850 px-1 rounded text-amber-400">Бос орын (Space)</kbd> — Суретті тез арада көрсету немесе жасыру.</li>
+                    <li><kbd class="bg-slate-850 px-1 rounded text-amber-400">F2</kbd> — Жаңа ойын бастау.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ТЕРЕЗЕ: ОЙЫН ТУРАЛЫ -->
+    <div id="modalAbout" class="fixed inset-0 bg-black/80 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-sm w-full p-6 shadow-2xl text-center relative">
+            <button onclick="closeModal('modalAbout')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <div class="w-16 h-16 bg-amber-500 text-slate-950 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-black">?</div>
+            <h3 class="text-lg font-bold text-amber-400">Кім миллионер болғысы келеді?</h3>
+            <p class="text-xs text-slate-400 mt-1">Нұсқасы: 4.5 PRO Edition</p>
+            <p class="text-sm text-slate-300 mt-4">Кастомизация мүмкіндіктері, қазақша дауыстық сүйемелдеу және адаптивті аудиопроцессоры бар аңызға айналған телеойынның электронды симуляторы.</p>
+            <p class="text-xs text-slate-500 mt-6">&copy; 2026. Барлық құқықтар қорғалған.</p>
+        </div>
+    </div>
+
+    <!-- =============== ХАБАРЛАМАЛАРДЫ ШЫҒАРУ ТЕРЕЗЕСІ =============== -->
+    <div id="customAlert" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 bg-slate-900 border-2 border-amber-500 rounded-xl p-4 shadow-2xl max-w-md hidden z-50 transition-all duration-300">
+        <div class="flex items-start gap-3">
+            <div class="p-2 bg-amber-500/10 rounded-lg text-amber-500" id="alertIcon">
+                <i class="fa-solid fa-circle-info text-xl"></i>
+            </div>
+            <div class="flex-grow">
+                <h4 class="font-bold text-sm text-slate-100" id="alertTitle">Хабарлама</h4>
+                <p class="text-xs text-slate-400 mt-1" id="alertMessage">Хабарлама мәтіні...</p>
+            </div>
+            <button onclick="closeAlert()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+    </div>
+
+    <!-- =============== СКРИПТТЕР =============== -->
+    <script>
+        let audioCtx = null;
+        let bgOscillator = null;
+        let bgGainNode = null;
+
+        // Сұрақтар базасы (15 қиындық деңгейіне сай қазақша сұрақтар)
+        const defaultQuestions = [
+            { level: 1, text: "Балғамен әдетте не қағады?", answers: ["Шеге", "Балта", "Бұрауыш", "Ара"], correct: 0 },
+            { level: 2, text: "Қай жануарды аң патшасы деп атайды?", answers: ["Арыстан", "Жолбарыс", "Аю", "Қабылан"], correct: 0 },
+            { level: 3, text: "Кемпірқосақта неше түс бар?", answers: ["7", "6", "8", "5"], correct: 0 },
+            { level: 4, text: "Күнге ең жақын орналасқан планета қайсы?", answers: ["Меркурий", "Шолпан", "Жер", "Марс"], correct: 0 },
+            { level: 5, text: "Токио қай мемлекеттің астанасы?", answers: ["Жапония", "Қытай", "Оңтүстік Корея", "Вьетнам"], correct: 0 },
+            { level: 6, text: "Әлемдегі ең тұзды теңіз қайсы?", answers: ["Өлі теңіз", "Қызыл теңіз", "Қара теңіз", "Жерорта теңізі"], correct: 0 },
+            { level: 7, text: "Жер бетіндегі ең үлкен құс қайсы?", answers: ["Түйеқұс", "Әлбатрос", "Бүркіт", "Пингвин"], correct: 0 },
+            { level: 8, text: "«Абай жолы» роман-эпопеясын кім жазды?", answers: ["Мұхтар Әуезов", "Абай Құнанбаев", "Сәбит Мұқанов", "Ілияс Есенберлин"], correct: 0 },
+            { level: 9, text: "Кәдімгі судың химиялық формуласы қандай?", answers: ["H2O", "CO2", "NaCl", "O2"], correct: 0 },
+            { level: 10, text: "Адам алғаш рет ғарышқа қай жылы ұшты?", answers: ["1961", "1957", "1969", "1975"], correct: 0 },
+            { level: 11, text: "Қай жануар ашық көзбен ұйықтайды?", answers: ["Жылан", "Балық", "Дельфин", "Қоян"], correct: 0 },
+            { level: 12, text: "Ұлыбританияда қандай ресми валюта қолданылады?", answers: ["Фунт стерлинг", "Евро", "Доллар", "Франк"], correct: 0 },
+            { level: 13, text: "Бөлме температурасында балқитын металл қайсы?", answers: ["Сынап", "Галлий", "Қорғасын", "Қалайы"], correct: 0 },
+            { level: 14, text: "Планетамыздағы ең терең тұщы көл қайсы?", answers: ["Байкал", "Виктория", "Танганьика", "Мичиган"], correct: 0 },
+            { level: 15, text: "Электр тогының күшін өлшейтін физикалық бірлік қалай аталады?", answers: ["Ампер", "Вольт", "Ом", "Ватт"], correct: 0 }
+        ];
+
+        let gameQuestions = [...defaultQuestions];
+
+        // Ақшалай баламалары (теңгемен)
+        const moneyLadderValues = [
+            "3 000 000", "1 500 000", "800 000", "400 000", "200 000",
+            "100 000", "50 000", "25 000", "15 000", "10 000",
+            "5 000", "3 000", "2 000", "1 000", "500"
+        ];
+
+        // Бастапқы күйлер жинағы
+        let state = {
+            isPlaying: false,
+            currentLevel: 0,
+            currentQuestion: null,
+            timerEnabled: true,
+            timerDuration: 30,
+            timerInterval: null,
+            secondsLeft: 30,
+            soundEnabled: true,
+            bgMusicEnabled: true,
+            volume: 0.8,
+            autostart: false,
+            showPhotos: true,
+            duplicateSpeech: true,
+            playerName: "Ойыншы 1",
+            playerScore: 0,
+            leaderboard: [
+                { name: "Бауыржан", score: "3 000 000 теңге" },
+                { name: "Динара", score: "100 000 теңге" },
+                { name: "Ербол", score: "5 000 теңге" }
+            ],
+            hostPhrases: {
+                welcome: "Армысыздар! Ойынымызды бастаймыз! Алғашқы сұрақ сізді күтуде.",
+                correct: "Тамаша, бұл дұрыс жауап! Сіз жақсы нәтиже көрсетіп жатырсыз. Келесі кезеңге өтеміз.",
+                wrong: "Өкінішке орай, бұл жауап қате. Ойын аяқталды."
+            },
+            hostName: "Есен Елеукен",
+            hostEmoji: "🤵",
+            lifelines: {
+                friendName: "Досқа қоңырау",
+                audienceName: "Зал көмегі"
+            },
+            friend: {
+                name: "Нұрлан",
+                phone: "+7 (707) 123-45-67",
+                job: "Тарих профессоры"
+            },
+            usedLifelines: {
+                fifty: false,
+                friend: false,
+                audience: false
+            }
+        };
+
+        window.onload = function() {
+            initAppInterface();
+            renderMoneyLadder();
+            loadSettingsFromMemory();
+            updateUIVariants();
+            speakText(state.hostPhrases.welcome);
+        };
+
+        function initAppInterface() {
+            document.getElementById('currentUserNameDisplay').innerText = state.playerName;
+            document.getElementById('currentUserScoreDisplay').innerText = state.playerScore + " теңге";
+            
+            document.getElementById('inputPlayerName').value = state.playerName;
+            document.getElementById('phraseWelcome').value = state.hostPhrases.welcome;
+            document.getElementById('phraseCorrect').value = state.hostPhrases.correct;
+            document.getElementById('phraseWrong').value = state.hostPhrases.wrong;
+            document.getElementById('cfgHostName').value = state.hostName;
+            document.getElementById('cfgHostEmoji').value = state.hostEmoji;
+            document.getElementById('cfgLifelineFriend').value = state.lifelines.friendName;
+            document.getElementById('cfgLifelineAudience').value = state.lifelines.audienceName;
+            document.getElementById('cfgFriendName').value = state.friend.name;
+            document.getElementById('cfgFriendPhone').value = state.friend.phone;
+            document.getElementById('cfgFriendJob').value = state.friend.job;
+
+            window.addEventListener('keydown', function(e) {
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    togglePhotoSpacebar();
+                }
+                if (e.key === 'F2') {
+                    startNewGame();
+                }
+            });
+        }
+
+        function loadSettingsFromMemory() {
+            renderLeaderboard();
+            updateStatsQuestions();
+        }
+
+        function renderMoneyLadder() {
+            const container = document.getElementById('moneyLadderContainer');
+            container.innerHTML = '';
+            
+            for (let i = 15; i >= 1; i--) {
+                const stepValue = moneyLadderValues[15 - i];
+                const isGuaranteed = (i === 5 || i === 10 || i === 15);
+                
+                let textClass = "text-slate-400";
+                let badgeClass = "bg-slate-800 text-slate-300";
+                
+                if (isGuaranteed) {
+                    textClass = "text-amber-400 font-extrabold";
+                    badgeClass = "bg-amber-500 text-slate-950 font-bold";
+                }
+
+                const stepDiv = document.createElement('div');
+                stepDiv.id = `ladder-step-${i}`;
+                stepDiv.className = `flex items-center justify-between p-1.5 rounded transition-colors ${textClass}`;
+                stepDiv.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] px-1.5 py-0.5 rounded ${badgeClass}">${i}</span>
+                        <span class="text-xs md:text-sm">${stepValue} теңге</span>
+                    </div>
+                    ${isGuaranteed ? '<i class="fa-solid fa-star text-[10px] text-amber-400"></i>' : ''}
+                `;
+                container.appendChild(stepDiv);
+            }
+        }
+
+        function highlightLadderStep(activeLevel) {
+            for (let i = 1; i <= 15; i++) {
+                const stepEl = document.getElementById(`ladder-step-${i}`);
+                if (!stepEl) continue;
+
+                stepEl.classList.remove('bg-emerald-500/20', 'border-l-4', 'border-emerald-500');
+
+                if (i === activeLevel) {
+                    stepEl.classList.add('bg-emerald-500/20', 'border-l-4', 'border-emerald-500');
+                    stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }
+        }
+
+        function initAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSynthSound(freq, type, duration) {
+            if (!state.soundEnabled) return;
+            initAudioContext();
+            try {
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                
+                osc.type = type || 'sine';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                
+                gain.gain.setValueAtTime(state.volume * 0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                console.error("Audio error", e);
+            }
+        }
+
+        function playWinMelody() {
+            const notes = [261.63, 329.63, 392.00, 523.25]; 
+            notes.forEach((freq, idx) => {
+                setTimeout(() => {
+                    playSynthSound(freq, 'triangle', 0.6);
+                }, idx * 150);
+            });
+        }
+
+        function playFailSound() {
+            playSynthSound(150, 'sawtooth', 0.8);
+        }
+
+        function startAmbientBgMusic() {
+            if (!state.bgMusicEnabled || !state.soundEnabled) return;
+            initAudioContext();
+            try {
+                if (bgOscillator) bgOscillator.stop();
+                
+                bgOscillator = audioCtx.createOscillator();
+                bgGainNode = audioCtx.createGain();
+                
+                bgOscillator.type = 'triangle';
+                bgOscillator.frequency.setValueAtTime(110, audioCtx.currentTime);
+                
+                bgGainNode.gain.setValueAtTime(state.volume * 0.1, audioCtx.currentTime);
+                
+                bgOscillator.connect(bgGainNode);
+                bgGainNode.connect(audioCtx.destination);
+                
+                bgOscillator.start();
+            } catch (e) {
+                console.error("BG Music Error", e);
+            }
+        }
+
+        function stopAmbientBgMusic() {
+            if (bgOscillator) {
+                try {
+                    bgOscillator.stop();
+                } catch(e){}
+                bgOscillator = null;
+            }
+        }
+
+        function startNewGame() {
+            state.isPlaying = true;
+            state.currentLevel = 1;
+            state.playerScore = 0;
+            
+            state.usedLifelines.fifty = false;
+            state.usedLifelines.friend = false;
+            state.usedLifelines.audience = false;
+
+            document.getElementById('btnLifelineFifty').disabled = false;
+            document.getElementById('btnLifelineFriend').disabled = false;
+            document.getElementById('btnLifelineAudience').disabled = false;
+
+            for(let i=0; i<4; i++) {
+                document.getElementById(`btnAnswer${i}`).disabled = false;
+                document.getElementById(`btnAnswer${i}`).classList.remove('bg-emerald-600', 'bg-rose-600', 'border-emerald-500', 'border-rose-500');
+            }
+
+            loadQuestionForLevel(1);
+            highlightLadderStep(1);
+
+            updateHostReplica("Сонымен, біз жаңа ойынды бастаймыз! Алдарыңызда бірінші сұрақ. Мұқият болыңыздар!");
+            startAmbientBgMusic();
+
+            if (state.showPhotos) {
+                showPhotoForLevel(1, "Ойын басталды! Сәттілік тілейміз!");
+            }
+
+            resetAndStartTimer();
+        }
+
+        function loadQuestionForLevel(level) {
+            const levelQ = gameQuestions.filter(q => q.level == level);
+            if (levelQ.length > 0) {
+                state.currentQuestion = levelQ[Math.floor(Math.random() * levelQ.length)];
+            } else {
+                state.currentQuestion = defaultQuestions[level - 1] || defaultQuestions[0];
+            }
+
+            document.getElementById('questionLevelLabel').innerText = `Сұрақ ${level} (Құны: ${moneyLadderValues[15 - level]} теңге)`;
+            document.getElementById('questionText').innerText = state.currentQuestion.text;
+
+            for (let i = 0; i < 4; i++) {
+                const btn = document.getElementById(`btnAnswer${i}`);
+                const txt = document.getElementById(`answerText${i}`);
+                btn.style.display = 'flex'; 
+                btn.classList.remove('bg-emerald-600', 'bg-rose-600', 'border-emerald-500', 'border-rose-500');
+                txt.innerText = state.currentQuestion.answers[i];
+            }
+        }
+
+        function selectAnswer(index) {
+            if (!state.isPlaying) return;
+            stopTimer();
+
+            const isCorrect = (index === state.currentQuestion.correct);
+            const btn = document.getElementById(`btnAnswer${index}`);
+
+            if (isCorrect) {
+                btn.classList.add('bg-emerald-600', 'border-emerald-500');
+                playWinMelody();
+
+                const currentPrizeStr = moneyLadderValues[15 - state.currentLevel].replace(/\s/g, '');
+                state.playerScore = parseInt(currentPrizeStr);
+                document.getElementById('currentUserScoreDisplay').innerText = state.playerScore.toLocaleString() + " теңге";
+
+                if (state.currentLevel === 15) {
+                    endGame(true);
+                } else {
+                    updateHostReplica(state.hostPhrases.correct);
+                    
+                    if (state.showPhotos && (state.currentLevel === 5 || state.currentLevel === 10)) {
+                        showPhotoForLevel(state.currentLevel, `Күймейтін сома: ${state.playerScore.toLocaleString()} теңге!`);
+                    }
+
+                    setTimeout(() => {
+                        state.currentLevel++;
+                        loadQuestionForLevel(state.currentLevel);
+                        highlightLadderStep(state.currentLevel);
+                        resetAndStartTimer();
+                    }, 2500);
+                }
+            } else {
+                btn.classList.add('bg-rose-600', 'border-rose-500');
+                const correctBtn = document.getElementById(`btnAnswer${state.currentQuestion.correct}`);
+                correctBtn.classList.add('bg-emerald-600', 'border-emerald-500');
+                playFailSound();
+                
+                updateHostReplica(state.hostPhrases.wrong);
+
+                setTimeout(() => {
+                    endGame(false);
+                }, 2500);
+            }
+        }
+
+        function resetAndStartTimer() {
+            stopTimer();
+            if (!state.timerEnabled) {
+                document.getElementById('countdownCircle').classList.add('hidden');
+                return;
+            }
+            document.getElementById('countdownCircle').classList.remove('hidden');
+            state.secondsLeft = state.timerDuration;
+            document.getElementById('timerSeconds').innerText = state.secondsLeft;
+
+            state.timerInterval = setInterval(() => {
+                state.secondsLeft--;
+                document.getElementById('timerSeconds').innerText = state.secondsLeft;
+                
+                if (state.secondsLeft <= 5) {
+                    playSynthSound(800, 'sine', 0.1);
+                } else {
+                    playSynthSound(400, 'sine', 0.05);
+                }
+
+                if (state.secondsLeft <= 0) {
+                    stopTimer();
+                    updateHostReplica("Ойлану уақыты аяқталды! Сіз жеңілдіңіз.");
+                    playFailSound();
+                    setTimeout(() => {
+                        endGame(false);
+                    }, 2000);
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (state.timerInterval) {
+                clearInterval(state.timerInterval);
+                state.timerInterval = null;
+            }
+        }
+
+        function takeMoney() {
+            if (!state.isPlaying || state.currentLevel <= 1) {
+                alertCustom("Назар аударыңыз", "Ақшаны алу үшін кем дегенде бірінші сұраққа дұрыс жауап беру керек!");
+                return;
+            }
+            stopTimer();
+            const prizeStr = moneyLadderValues[15 - (state.currentLevel - 1)].replace(/\s/g, '');
+            state.playerScore = parseInt(prizeStr);
+            
+            updateHostReplica(`Ақылды шешім! Сіз өзіңіздің адал ұтып алған ақшаңызды аласыз — ${state.playerScore.toLocaleString()} теңге.`);
+            playWinMelody();
+
+            setTimeout(() => {
+                endGame(true, true);
+            }, 2500);
+        }
+
+        function endGame(isWin, isTakeMoney = false) {
+            state.isPlaying = false;
+            stopTimer();
+            stopAmbientBgMusic();
+
+            let finalPrize = 0;
+            if (isWin) {
+                finalPrize = state.playerScore;
+            } else {
+                if (state.currentLevel >= 10) {
+                    finalPrize = parseInt(moneyLadderValues[5].replace(/\s/g, '')); 
+                } else if (state.currentLevel >= 5) {
+                    finalPrize = parseInt(moneyLadderValues[10].replace(/\s/g, '')); 
+                } else {
+                    finalPrize = 0;
+                }
+            }
+
+            state.playerScore = finalPrize;
+            document.getElementById('currentUserScoreDisplay').innerText = finalPrize.toLocaleString() + " теңге";
+
+            state.leaderboard.push({ name: state.playerName, score: finalPrize.toLocaleString() + " теңге" });
+            renderLeaderboard();
+
+            alertCustom(
+                isWin ? "Жеңіс!" : "Ойын аяқталды", 
+                `${state.playerName} ойыншының соңғы ұтысы: ${finalPrize.toLocaleString()} теңге құрады!`
+            );
+
+            if (state.autostart) {
+                setTimeout(() => {
+                    startNewGame();
+                }, 4000);
+            }
+        }
+
+        function useFiftyFifty() {
+            if (!state.isPlaying || state.usedLifelines.fifty) return;
+            state.usedLifelines.fifty = true;
+            document.getElementById('btnLifelineFifty').disabled = true;
+
+            const correctIdx = state.currentQuestion.correct;
+            let indicesToHide = [];
+
+            for (let i = 0; i < 4; i++) {
+                if (i !== correctIdx) {
+                    indicesToHide.push(i);
+                }
+            }
+
+            indicesToHide.sort(() => Math.random() - 0.5);
+            indicesToHide.slice(0, 2).forEach(idx => {
+                document.getElementById(`btnAnswer${idx}`).style.display = 'none';
+            });
+
+            updateHostReplica("Компьютер екі қате жауапты жойды. Қазір дұрыс жауапты табу әлдеқайда жеңілірек!");
+            playSynthSound(600, 'triangle', 0.4);
+        }
+
+        function usePhoneFriend() {
+            if (!state.isPlaying || state.usedLifelines.friend) return;
+            state.usedLifelines.friend = true;
+            document.getElementById('btnLifelineFriend').disabled = true;
+
+            const correctLetter = ["A", "B", "C", "D"][state.currentQuestion.correct];
+            const isFriendSmart = Math.random() > 0.15; 
+            let friendAdvice = "";
+
+            if (isFriendSmart) {
+                friendAdvice = `Мен 90%-ға сенімдімін, дұрыс жауап — ${correctLetter} нұсқасы (${state.currentQuestion.answers[state.currentQuestion.correct]}).`;
+            } else {
+                const wrongAnswers = [0, 1, 2, 3].filter(idx => idx !== state.currentQuestion.correct);
+                const randomWrongIdx = wrongAnswers[Math.floor(Math.random() * wrongAnswers.length)];
+                const wrongLetter = ["A", "B", "C", "D"][randomWrongIdx];
+                friendAdvice = `Ой, бұл қиын сұрақ екен. Меніңше, дұрысы ${wrongLetter} болуы мүмкін, бірақ қателесуім де ғажап емес.`;
+            }
+
+            updateHostReplica(`Досыңызға қоңырау шалынуда (${state.friend.name}, тел: ${state.friend.phone})... Досыңыз былай дейді: "${friendAdvice}"`);
+            playSynthSound(500, 'sine', 1.0);
+        }
+
+        function useAskAudience() {
+            if (!state.isPlaying || state.usedLifelines.audience) return;
+            state.usedLifelines.audience = true;
+            document.getElementById('btnLifelineAudience').disabled = true;
+
+            let votes = [0, 0, 0, 0];
+            const correctIdx = state.currentQuestion.correct;
+
+            votes[correctIdx] = Math.floor(Math.random() * 30) + 50; 
+            let remaining = 100 - votes[correctIdx];
+
+            for (let i = 0; i < 4; i++) {
+                if (i !== correctIdx) {
+                    const share = Math.floor(Math.random() * remaining);
+                    votes[i] = share;
+                    remaining -= share;
+                }
+            }
+            const lastIdx = [0,1,2,3].filter(idx => idx !== correctIdx).pop();
+            votes[lastIdx] += remaining;
+
+            const pollResults = `Көрермендердің дауыс беру нәтижесі:\nA: ${votes[0]}%, B: ${votes[1]}%, C: ${votes[2]}%, D: ${votes[3]}%`;
+            updateHostReplica(`Зал дауыс берді! ${pollResults}`);
+            playSynthSound(440, 'triangle', 0.5);
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function toggleAutostart(val) {
+            state.autostart = val;
+            alertCustom("Автобастау", val ? "Ойынның автобастау режимі қосылды" : "Автобастау режимі өшірілді");
+        }
+
+        function toggleShowPhotos(val) {
+            state.showPhotos = val;
+            alertCustom("Фотосуреттер", val ? "Иллюстрацияларды көрсету қосылды" : "Иллюстрацияларды көрсету өшірілді");
+        }
+
+        function togglePhotoSpacebar() {
+            if (!state.showPhotos) return;
+            const photoWin = document.getElementById('photoWindow');
+            if (photoWin.classList.contains('hidden')) {
+                photoWin.classList.remove('hidden');
+            } else {
+                photoWin.classList.add('hidden');
+            }
+        }
+
+        function togglePhotoModal(visible) {
+            const photoWin = document.getElementById('photoWindow');
+            if (visible) {
+                photoWin.classList.remove('hidden');
+            } else {
+                photoWin.classList.add('hidden');
+            }
+        }
+
+        function toggleSound(val) {
+            state.soundEnabled = val;
+            if (!val) stopAmbientBgMusic();
+        }
+
+        function toggleBgMusic(val) {
+            state.bgMusicEnabled = val;
+            if (val && state.isPlaying) {
+                startAmbientBgMusic();
+            } else {
+                stopAmbientBgMusic();
+            }
+        }
+
+        function updateVolume(val) {
+            state.volume = val / 100;
+            document.getElementById('volVal').innerText = `${val}%`;
+            if (bgGainNode) {
+                bgGainNode.gain.setValueAtTime(state.volume * 0.1, audioCtx.currentTime);
+            }
+        }
+
+        function toggleSpeechDuplication(val) {
+            state.duplicateSpeech = val;
+            const panel = document.getElementById('duplicateSpeechPanel');
+            if (val) {
+                panel.classList.remove('hidden');
+            } else {
+                panel.classList.add('hidden');
+            }
+        }
+
+        function toggleTimer(val) {
+            state.timerEnabled = val;
+            if (!val) {
+                stopTimer();
+                document.getElementById('countdownCircle').classList.add('hidden');
+            } else if (state.isPlaying) {
+                resetAndStartTimer();
+            }
+        }
+
+        function updateTimerDuration(val) {
+            state.timerDuration = parseInt(val);
+            document.getElementById('timerVal').innerText = `${val} сек`;
+        }
+
+        function savePlayerName() {
+            const newName = document.getElementById('inputPlayerName').value.trim();
+            if (newName) {
+                state.playerName = newName;
+                document.getElementById('currentUserNameDisplay').innerText = newName;
+                closeModal('modalPlayer');
+                alertCustom("Сақталды", `Ойыншы аты өзгертілді: ${newName}`);
+            }
+        }
+
+        function resetPlayerName() {
+            state.playerName = "Ойыншы 1";
+            document.getElementById('inputPlayerName').value = "Ойыншы 1";
+            document.getElementById('currentUserNameDisplay').innerText = "Ойыншы 1";
+            closeModal('modalPlayer');
+        }
+
+        function clearLeaderboard() {
+            state.leaderboard = [];
+            renderLeaderboard();
+            alertCustom("Рейтинг", "Рекордтар тізімі тазаланды.");
+        }
+
+        function renderLeaderboard() {
+            const tbody = document.getElementById('leaderboardTableBody');
+            tbody.innerHTML = '';
+            
+            const sorted = [...state.leaderboard].sort((a,b) => {
+                const numA = parseInt(a.score.replace(/\s/g, ''));
+                const numB = parseInt(b.score.replace(/\s/g, ''));
+                return numB - numA;
+            });
+
+            sorted.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-850 hover:bg-slate-900";
+                tr.innerHTML = `
+                    <td class="p-2 font-bold text-amber-500">${index + 1}</td>
+                    <td class="p-2">${row.name}</td>
+                    <td class="p-2 text-right text-emerald-400 font-semibold">${row.score}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function addCustomQuestion() {
+            const qText = document.getElementById('newQText').value.trim();
+            const qA = document.getElementById('newQA').value.trim();
+            const qB = document.getElementById('newQB').value.trim();
+            const qC = document.getElementById('newQC').value.trim();
+            const qD = document.getElementById('newQD').value.trim();
+            const qLev = parseInt(document.getElementById('newQLevel').value);
+
+            if (!qText || !qA || !qB || !qC || !qD) {
+                alertCustom("Қателік", "Сұрақ пен барлық жауап нұсқаларын толықтырыңыз!");
+                return;
+            }
+
+            const newQ = {
+                level: qLev,
+                text: qText,
+                answers: [qA, qB, qC, qD],
+                correct: 0 
+            };
+
+            gameQuestions.push(newQ);
+            updateStatsQuestions();
+
+            document.getElementById('newQText').value = '';
+            document.getElementById('newQA').value = '';
+            document.getElementById('newQB').value = '';
+            document.getElementById('newQC').value = '';
+            document.getElementById('newQD').value = '';
+
+            alertCustom("Сұрақ қосылды", `Қиындығы ${qLev} деңгейлі жаңа сұрақ сәтті сақталды.`);
+        }
+
+        function updateStatsQuestions() {
+            document.getElementById('statTotalQ').innerText = gameQuestions.length;
+            document.getElementById('statEasyQ').innerText = gameQuestions.filter(q => q.level <= 5).length;
+            document.getElementById('statHardQ').innerText = gameQuestions.filter(q => q.level > 10).length;
+        }
+
+        function saveHostPhrases() {
+            state.hostPhrases.welcome = document.getElementById('phraseWelcome').value;
+            state.hostPhrases.correct = document.getElementById('phraseCorrect').value;
+            state.hostPhrases.wrong = document.getElementById('phraseWrong').value;
+            closeModal('modalPhrases');
+            alertCustom("Жаңартылды", "Жүргізуші сөздері сәтті өзгертілді.");
+        }
+
+        function changeBgColor(color) {
+            document.getElementById('gameBody').style.backgroundColor = color;
+        }
+
+        function updateScale(val) {
+            const scale = val / 100;
+            document.getElementById('scaleVal').innerText = `${scale.toFixed(2)}x`;
+            document.getElementById('scaleWrapper').style.transform = `scale(${scale})`;
+        }
+
+        function updateOpacity(val) {
+            const opacity = val / 100;
+            document.getElementById('opacityVal').innerText = `${val}%`;
+            document.getElementById('hostBox').style.opacity = opacity;
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alertCustom("Қателік", "Толық экран режиміне өту мүмкін болмады.");
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function applyGameSettings() {
+            state.hostName = document.getElementById('cfgHostName').value;
+            state.hostEmoji = document.getElementById('cfgHostEmoji').value || "🤵";
+            state.lifelines.friendName = document.getElementById('cfgLifelineFriend').value;
+            state.lifelines.audienceName = document.getElementById('cfgLifelineAudience').value;
+
+            state.friend.name = document.getElementById('cfgFriendName').value;
+            state.friend.phone = document.getElementById('cfgFriendPhone').value;
+            state.friend.job = document.getElementById('cfgFriendJob').value;
+
+            updateUIVariants();
+            closeModal('modalGameSettings');
+            alertCustom("Сақталды", "Ойын мен көмектер конфигурациясы жаңартылды.");
+        }
+
+        function updateUIVariants() {
+            document.getElementById('hostNameLabel').innerText = state.hostName;
+            document.getElementById('lblLifelineFriendName').innerText = state.lifelines.friendName;
+            document.getElementById('lblLifelineAudienceName').innerText = state.lifelines.audienceName;
+            
+            document.getElementById('hostAvatarContainer').innerHTML = `
+                <span class="text-4xl">${state.hostEmoji}</span>
+            `;
+        }
+
+        const tips = [
+            "Маңызды сұрақтарда 50:50 көмегін қолданған тиімдірек болады.",
+            "5-ші және 10-шы деңгейлердегі күймейтін сомаларды алуға тырысыңыз!",
+            "Егер мүлде сенімді болмасаңыз, досқа қоңырау шалу мүмкіндігін қалдырыңыз.",
+            "Сұрақтар редакторында жаңа тақырыптық сұрақтар енгізіп, достарыңызбен жарыса аласыз."
+        ];
+        function showTipOfDay() {
+            const randomTip = tips[Math.floor(Math.random() * tips.length)];
+            alertCustom("Күн кеңесі", randomTip);
+        }
+
+        function exitApp() {
+            alertCustom("Ойыннан шығу", "Ойыннан шығу үшін осы браузер терезесін жаба аласыз.");
+        }
+
+        function updateHostReplica(text) {
+            document.getElementById('hostReplicaText').innerText = text;
+            speakText(text);
+        }
+
+        function speakText(text) {
+            if (!state.duplicateSpeech) return;
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                
+                const cleanText = text.replace(/<[^>]*>/g, ''); 
+                let utterance = new SpeechSynthesisUtterance(cleanText);
+                utterance.lang = 'kk-KZ'; // Қазақ тілі дауыстық пакеті
+                utterance.rate = 1.0;
+                utterance.volume = state.volume;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function showPhotoForLevel(level, caption) {
+            const photoWin = document.getElementById('photoWindow');
+            const placeholder = document.getElementById('photoPlaceholder');
+            const photoCaption = document.getElementById('photoCaption');
+
+            photoWin.classList.remove('hidden');
+            photoCaption.innerText = caption;
+
+            const colors = [
+                "from-blue-600 to-indigo-900",
+                "from-emerald-500 to-teal-800",
+                "from-amber-500 to-orange-700",
+                "from-purple-600 to-pink-900"
+            ];
+            const randomBg = colors[level % colors.length];
+
+            placeholder.className = `w-48 h-36 bg-gradient-to-br ${randomBg} border-2 border-amber-500 rounded flex items-center justify-center overflow-hidden glow-gold relative`;
+            placeholder.innerHTML = `
+                <div class="text-center p-2">
+                    <i class="fa-solid fa-image text-3xl text-white/50 mb-1"></i>
+                    <div class="text-[10px] text-white/80 font-bold uppercase tracking-widest">${level}-деңгей</div>
+                    <div class="text-[8px] text-amber-300 mt-1">фотосурет: photos/photo_${level}.jpg</div>
+                </div>
+                <div class="absolute bottom-0 inset-x-0 bg-slate-950/80 py-1 text-[10px] text-amber-400 font-bold uppercase tracking-wider" id="photoCaption">${caption}</div>
+            `;
+        }
+
+        function alertCustom(title, message) {
+            document.getElementById('alertTitle').innerText = title;
+            document.getElementById('alertMessage').innerText = message;
+            
+            const alertBox = document.getElementById('customAlert');
+            alertBox.classList.remove('hidden');
+            alertBox.classList.add('flex');
+
+            setTimeout(() => {
+                closeAlert();
+            }, 6000);
+        }
+
+        function closeAlert() {
+            const alertBox = document.getElementById('customAlert');
+            alertBox.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
